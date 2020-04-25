@@ -63,37 +63,46 @@
         }
     });
 
-
-
-
     $('#modalSave').on('click', function() {
-        console.log('test'); 
         event.preventDefault();
-
-        if ($('#form').valid()) {
-            var dataform = $('#form').serializeArray();
-            var id = $('#universalModal').data('idBarang');
-            $.ajax({
-                url: "<?php echo base_url('Master/saveMasterBarang/');?>"+id,
-                type: "POST",
-                data: dataform,
-                dataType: "JSON",
-                success: function(data, status) {
-                    if (data.Error == false) {
+        if (event.handled !== true) {
+            event.handled = true;
+            if ($('#form').valid()) {
+                var dataform = $('#form').serializeArray();
+                var id = $('#universalModal').data('idBarang');
+                $.ajax({
+                    url: "<?php echo base_url('Master/saveMasterBarang/');?>"+id,
+                    type: "POST",
+                    data: dataform,
+                    dataType: "JSON",
+                    success: function(data, status) {
+                        if (data.Error == false) {
+                            swal.fire({
+                                title    : 'Success',
+                                html     : '<h5>'+ data.Pesan +'</h5>',
+                                icon     : 'success',
+                                animation: true
+                            }).then((result) => {
+                                tblMasterBarang.ajax.reload(null,true);
+                                $('#universalModal').modal('hide');
+                            });
+                        }
+                        else {
+                            swal.fire({
+                                title    : 'Cannot insert data',
+                                html     : '<h5>'+ data.Pesan +'</h5>',
+                                icon     : 'error',
+                                animation: true
+                            }).then((result) => {
+                                tblMasterBarang.ajax.reload(null,true);
+                                // $('#universalModal').modal('hide');
+                            });
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
                         swal.fire({
-                            title    : 'Success',
-                            html     : '<h5>'+ data.Pesan +'</h5>',
-                            icon     : 'success',
-                            animation: true
-                        }).then((result) => {
-                            tblMasterBarang.ajax.reload(null,true);
-                            $('#universalModal').modal('hide');
-                        });
-                    }
-                    else {
-                        swal.fire({
-                            title    : 'Cannot insert data',
-                            html     : '<h5>'+ data.Pesan +'</h5>',
+                            title    : textStatus,
+                            html     : '<h5>'+ errorThrown +'</h5>',
                             icon     : 'error',
                             animation: true
                         }).then((result) => {
@@ -101,27 +110,16 @@
                             // $('#universalModal').modal('hide');
                         });
                     }
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    swal.fire({
-                        title    : textStatus,
-                        html     : '<h5>'+ errorThrown +'</h5>',
-                        icon     : 'error',
-                        animation: true
-                    }).then((result) => {
-                        tblMasterBarang.ajax.reload(null,true);
-                        // $('#universalModal').modal('hide');
-                    });
-                }
-            });
-        }
-        else{
-            swal.fire({
-                title    : "Data not valid",
-                text     : 'Please fill up all required filed',
-                icon     : 'error',
-                animation: true
-            })
+                });
+            }
+            else{
+                swal.fire({
+                    title    : "Data not valid",
+                    text     : 'Please fill up all required filed',
+                    icon     : 'error',
+                    animation: true
+                })
+            }
         }
     })
 
